@@ -1,0 +1,13 @@
+services:
+    laravel-app:
+        container_name: laravel-app
+
+        environment:
+          - APP_ENV=development
+          - APP_DEBUG=true
+        volumes:
+          - .:/app:ro
+          - /app/bootstrap/cache
+          - /app/storage
+
+
