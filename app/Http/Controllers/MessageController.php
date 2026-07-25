@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
@@ -43,6 +44,27 @@ class MessageController extends Controller
             'message' => $message,
         ]);
 
+    }
+
+    public function index()
+    {
+        $userId = auth()->id();
+
+        $userIds = Message::where('user_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->pluck('user_id')
+            ->merge(Message::where('user_id', $userId)
+                ->orWhere('receiver_id', $userId)
+                ->pluck('receiver_id'))
+            ->unique()
+            ->filter(fn($id) => $id != $userId)
+            ->values();
+
+        $users = User::whereIn('id', $userIds)->get(['id', 'name', 'email']);
+
+        return response()->json([
+            'users' => $users,
+        ]);
     }
 
     /**

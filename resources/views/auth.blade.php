@@ -57,7 +57,7 @@
             localStorage.setItem('user_data', JSON.stringify(userData));
 
             // تحويل المستخدم مباشرة لصفحة الشات
-            window.location.assign('http://127.0.0.1:8000/chat');
+            window.location.assign('/chat');
         } catch(err) {
             alert(err.response?.data?.message || 'Error occurred');
             console.error(err);

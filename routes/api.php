@@ -26,6 +26,11 @@ Route::middleware('auth:sanctum')->controller(UserAuthController::class)->group(
 
 
 Route::middleware('auth:sanctum')->group(function(){
+
+    Route::post('image_store',[UserAuthController::class,'storeImage']);
+    Route::post('update_store',[UserAuthController::class,'updateImage']);
+    Route::delete('delete_store',[UserAuthController::class,'deleteImage']);
+
     Route::get('/all-notification', [FirebaseController::class, 'UserNotifications'])->middleware('permission:edit users');
     Route::post('/send-notification', [FirebaseController::class, 'send']);
     Route::post('fcm_token',[UserAuthController::class,'Save_FCM_TOKEN']);
@@ -47,6 +52,13 @@ Route::middleware('auth:sanctum')->group(function(){
 
 });
 Route::post('updateProductDiscount',[ProductController::class,'updateProductDiscount']);
+
+Route::post('test-pay',[ProductController::class,'payWithJazzCash']);
+
+
+
+
+// test 
 
 
 Route::prefix('v1')->middleware('api')->group(base_path('routes/api_v1.php'));
