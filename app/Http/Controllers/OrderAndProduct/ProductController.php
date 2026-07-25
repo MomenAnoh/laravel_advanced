@@ -84,6 +84,19 @@ class ProductController extends Controller
     }
     public function updateProductDiscount(Request $request)
     {
+
+
+
+
+
+
+
+
+
+
+
+
+    
         $discount=$request->discount;
         UpdateProductDiscount::dispatch();
          return response()->json(['message' => 'Discount update queued successfully!']);
