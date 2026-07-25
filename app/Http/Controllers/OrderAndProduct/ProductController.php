@@ -89,14 +89,15 @@ class ProductController extends Controller
 
 
 
-
-
-
-
-
-
-
     
+
+
+
+
+
+
+
+
         $discount=$request->discount;
         UpdateProductDiscount::dispatch();
          return response()->json(['message' => 'Discount update queued successfully!']);
