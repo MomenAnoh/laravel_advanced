@@ -1,0 +1,21 @@
+name: doploy-project
+
+on:
+  push:
+    branches:
+      - main
+jops:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: action/checkout@v4
+
+      - name:  Setup PHP
+        uses:  shivammathur/setup-php@v2
+        with: 
+             php-version: '8.4'
+
+      - name:  Composer install
+        run:  composer install --no-interaction --prefer-dist  
+              
