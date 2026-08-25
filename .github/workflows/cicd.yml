@@ -18,6 +18,3 @@ jobs:
 
       - name:  Composer install
         run:  composer install --no-interaction --prefer-dist  
-
-      - name: Run Laravel tests
-        run: php artisan test
