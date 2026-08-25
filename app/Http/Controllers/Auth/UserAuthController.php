@@ -54,4 +54,27 @@ class UserAuthController extends Controller
 
          return $user;
     }
+    public function storeImage(Request $request)
+    {
+       $user=Auth::user();
+     $test= $user->addMediaFromRequest('image')->toMediaCollection('users/images');
+    //   $user->addMultipleMediaFromRequest(['images']) ; // multiable images in one step
+      return response()->json($user->getFirstMediaUrl('users/images'));
+        
+    }
+     public function updateImage(Request $request)
+    {
+        $user=Auth::user();
+         $user->clearMediaCollection('users/images');
+      $test= $user->addMediaFromRequest('image')->toMediaCollection('users/images');
+      return response()->json($user->getFirstMediaUrl('users/images'));
+    }
+     public function deleteImage(Request $request)
+    {
+        $user=Auth::user();                 
+        $user->clearMediaCollection('avatar');
+              return response()->json('success');
+
+
+    }
 }

@@ -1,130 +1,414 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Dashboard</title>
+    <title>Chat</title>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+
     <style>
-        body { font-family: sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
-        .container { max-width: 1200px; margin: 20px auto; display: flex; gap: 20px; }
-        .sidebar { width: 25%; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .chat-window { width: 75%; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 600px; }
-        #messages { flex: 1; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
-        input, button { padding: 10px; margin: 5px 0; }
-        button { cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 5px; }
-        li { cursor: pointer; padding: 5px; border-radius: 5px; }
-        li:hover { background: #f0f0f0; }
-        .msg-left { background: #eee; text-align: left; padding: 5px; border-radius: 5px; margin-bottom: 5px; }
-        .msg-right { background: #cce5ff; text-align: right; padding: 5px; border-radius: 5px; margin-bottom: 5px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app {
+            width: 900px;
+            max-width: 95%;
+            height: 80vh;
+            display: flex;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .sidebar-header small {
+            display: block;
+            font-weight: normal;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .users-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #1e293b;
+            transition: background 0.2s;
+        }
+
+        .user-item:hover {
+            background: #1e293b;
+        }
+
+        .user-item.active {
+            background: #1e3a5f;
+        }
+
+        .user-item .name {
+            font-weight: 500;
+        }
+
+        .user-item .email {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: #111827;
+            border-bottom: 1px solid #334155;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #status {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            clear: both;
+        }
+
+        .me {
+            background: #2563eb;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .other {
+            background: #334155;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .system {
+            background: #065f46;
+            margin: 0 auto 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .meta {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .footer {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            border-top: 1px solid #334155;
+            background: #111827;
+        }
+
+        .footer input {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #334155;
+            color: white;
+            outline: none;
+        }
+
+        .footer button {
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .footer button:hover {
+            opacity: .9;
+        }
+
+        .no-selection {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 16px;
+        }
     </style>
 </head>
+
 <body>
+    <div class="app">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                Users
+                <small id="connectionStatus">Connecting...</small>
+            </div>
+            <div class="users-list" id="usersList"></div>
+        </div>
 
-<div class="container">
-    <div class="sidebar">
-        <h3>Users</h3>
-        <ul id="users"></ul>
+        <div class="chat-area">
+            <div class="chat-header">
+                <span id="chatHeader">Select a user to chat</span>
+                <div id="status"></div>
+            </div>
+
+            <div id="messages">
+                <div class="no-selection">Select a user from the sidebar to start chatting</div>
+            </div>
+
+            <div class="footer">
+                <input
+                    type="text"
+                    id="message"
+                    placeholder="Type a message..."
+                    disabled>
+                <button id="sendBtn" onclick="sendMessage()" disabled>
+                    Send
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="chat-window">
-        <h3 id="chatWith">Select a user to chat</h3>
-        <div id="messages"></div>
-        <form id="messageForm" style="display:flex; gap:10px;">
-            <input type="text" id="messageInput" placeholder="Type your message..." style="flex:1;"/>
-            <button type="submit">Send</button>
-        </form>
-    </div>
-</div>
+    <script>
+        const userData = JSON.parse(localStorage.getItem('user_data'));
 
-<script>
-    // جلب بيانات المستخدم من localStorage
-    const userData = JSON.parse(localStorage.getItem('user_data'));
-    if(!userData) {
-        alert('User not logged in!');
-        window.location.href = '/auth';
-    }
-
-    const token = userData.token;
-    let selectedUserId = null;
-
-    // إعداد Axios مع Authorization header
-    const axiosInstance = axios.create({
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+        if (!userData) {
+            window.location.assign('/login-page');
         }
-    });
 
-
-    axiosInstance.get("http://127.0.0.1:8000/api/users")
-        .then(res => {
-            const ul = document.getElementById('users');
-            res.data.data.forEach(user => {
-                if(user.id !== userData.id) {  
-                    const li = document.createElement('li');
-                    li.textContent = user.name;
-                    li.addEventListener('click', () => selectUser(user));
-                    ul.appendChild(li);
-                }
-            });
+        const api = axios.create({
+            baseURL: '/api',
+            headers: {
+                Authorization: `Bearer ${userData.token}`,
+                Accept: 'application/json',
+            },
         });
 
-    // تحميل رسائل مع يوزر محدد
-    function selectUser(user) {
-        selectedUserId = user.id;
-        document.getElementById('chatWith').textContent = `Chat with ${user.name}`;
-        document.getElementById('messages').innerHTML = '';
+        let selectedUserId = null;
 
-        axiosInstance.get(`http://127.0.0.1:8000/api/message/${user.id}`)
-            .then(res => {
-                res.data.messages.forEach(msg => addMessage(msg));
-            });
-    }
-    document.getElementById('messageForm').addEventListener('submit', function(e){
-        e.preventDefault();
-        if(!selectedUserId) return alert('Select a user first');
-        const body = document.getElementById('messageInput').value;
-        if(!body.trim()) return;
+        const socket = io('http://localhost:6001', {
+            transports: ['websocket'],
+        });
 
-        axiosInstance.post(`http://127.0.0.1:8000/api/message/${selectedUserId}`, { body })
-            .then(res => {
-                document.getElementById('messageInput').value = '';
-                // هذا السطر يضمن ظهور الرسالة للمرسل على الفور
-                addMessage(res.data.message);
-            });
-    });
+        const messagesEl = document.getElementById('messages');
+        const statusEl = document.getElementById('status');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const usersList = document.getElementById('usersList');
+        const chatHeader = document.getElementById('chatHeader');
+        const messageInput = document.getElementById('message');
+        const sendBtn = document.getElementById('sendBtn');
 
-    // دالة إضافة رسالة
-    function addMessage(msg) {
-        // backend لازم يبعت user مع الرسالة
-        const senderId = msg.user_id || msg.user?.id;
-        const senderName = msg.user?.name || (senderId === userData.id ? userData.name : "User");
+        // ---------- Socket ----------
 
-        const isCurrentUser = senderId === userData.id;
-        const div = document.createElement('div');
-        div.className = isCurrentUser ? 'msg-right' : 'msg-left';
-        div.innerHTML = `<strong>${senderName}</strong>: ${msg.body} <br><small>${msg.created_at}</small>`;
+        socket.on('connect', () => {
+            connectionStatus.textContent = '🟢 Connected';
+            socket.emit('join-room', 'user_' + userData.id);
+        });
 
-        const container = document.getElementById('messages');
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
-    }
+        socket.on('disconnect', () => {
+            connectionStatus.textContent = '🔴 Disconnected';
+        });
 
-    // 👇 الاشتراك مرة واحدة في قناة خاصة بيك
-    window.Echo.private(`Private.chat.${userData.id}`)
-        .listen('MessageSent', (e) => {
-            // التحقق من أن الرسالة تخص الشات المفتوح حاليًا
-            // سواء كانت مرسلة من المستخدم الآخر أو مرسلة منك
-            if (e.message.user_id === selectedUserId || e.message.receiver_id === selectedUserId) {
-                addMessage(e.message);
+        socket.on('connect_error', (err) => {
+            connectionStatus.textContent = '🔴 Connection error';
+            console.error('Socket connection error:', err.message);
+        });
+
+        socket.on('message', (data) => {
+            const isMe = data.sender_id === userData.id;
+            appendMessage(
+                data.sender + ': ' + data.message,
+                isMe ? 'me' : 'other',
+                data.time || 'just now'
+            );
+        });
+
+        // ---------- Load Users ----------
+
+        async function loadUsers() {
+            try {
+                const res = await api.get('/users');
+                const users = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+
+                usersList.innerHTML = '';
+                let first = null;
+                users.forEach((user) => {
+                    if (user.id === userData.id) return;
+                    if (!first) first = user;
+                    const div = document.createElement('div');
+                    div.className = 'user-item';
+                    div.dataset.id = user.id;
+                    div.innerHTML = `
+                        <div class="name">${user.name}</div>
+                        <div class="email">${user.email}</div>
+                    `;
+                    div.addEventListener('click', () => selectUser(user));
+                    usersList.appendChild(div);
+                });
+                if (first) selectUser(first);
+            } catch (err) {
+                console.error('Failed to load users', err);
             }
+        }
+
+        // ---------- Select User ----------
+
+        async function selectUser(user) {
+            selectedUserId = user.id;
+            chatHeader.textContent = 'Chat with ' + user.name;
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+
+            document.querySelectorAll('.user-item').forEach((el) => {
+                el.classList.toggle('active', parseInt(el.dataset.id) === user.id);
+            });
+
+     
+
+            messagesEl.innerHTML = '';
+            appendMessage('Chat with ' + user.name, 'system');
+
+            try {
+                const res = await api.get('/message/' + user.id);
+                const msgs = res.data?.messages || res.data?.data || [];
+
+                (Array.isArray(msgs) ? msgs : []).forEach((msg) => {
+                    const isMe = msg.user_id === userData.id;
+                    appendMessage(
+                        (isMe ? 'Me' : msg.user?.name || 'Unknown') + ': ' + msg.body,
+                        isMe ? 'me' : 'other',
+                        msg.created_at
+                    );
+                });
+
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            } catch (err) {
+                console.error('Failed to load messages', err);
+            }
+        }
+
+        // ---------- Send Message ----------
+
+        async function sendMessage() {
+            const input = messageInput;
+            const text = input.value.trim();
+
+            if (!text || !selectedUserId) return;
+
+            input.value = '';
+
+            appendMessage('Me: ' + text, 'me');
+
+            try {
+                const res = await api.post('/message/' + selectedUserId, { body: text });
+                const msg = res.data?.message || res.data?.data;
+                socket.emit('message', {
+                    receiver:  selectedUserId,
+                    sender: userData.name,
+                    sender_id: userData.id,
+                    message: msg?.body || text,
+                    time: msg?.created_at || 'just now',
+                });
+            } catch (err) {
+                console.error('Failed to send message', err);
+            }
+        }
+
+        // ---------- Append Message ----------
+
+        function appendMessage(text, type = 'other', time = null) {
+            const noSelection = messagesEl.querySelector('.no-selection');
+            if (noSelection) noSelection.remove();
+
+            const div = document.createElement('div');
+            div.classList.add('message');
+
+            if (type === 'me') {
+                div.classList.add('me');
+            } else if (type === 'other') {
+                div.classList.add('other');
+            } else {
+                div.classList.add('system');
+            }
+
+            div.innerHTML = text;
+
+            if (time) {
+                const meta = document.createElement('div');
+                meta.className = 'meta';
+                meta.textContent = time;
+                div.appendChild(meta);
+            }
+
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        // ---------- Enter key ----------
+
+        messageInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
         });
-</script>
+
+        // ---------- Init ----------
+
+        loadUsers();
+    </script>
 
 </body>
-</html> 
 
-
+</html>

@@ -5,6 +5,8 @@ use App\Http\Controllers\FirebaseController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderAndProduct\ProductController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\TamaraController;
+use App\Http\Controllers\TestFlycontroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,11 @@ Route::middleware('auth:sanctum')->controller(UserAuthController::class)->group(
 
 
 Route::middleware('auth:sanctum')->group(function(){
+
+    Route::post('image_store',[UserAuthController::class,'storeImage']);
+    Route::post('update_store',[UserAuthController::class,'updateImage']);
+    Route::delete('delete_store',[UserAuthController::class,'deleteImage']);
+
     Route::get('/all-notification', [FirebaseController::class, 'UserNotifications'])->middleware('permission:edit users');
     Route::post('/send-notification', [FirebaseController::class, 'send']);
     Route::post('fcm_token',[UserAuthController::class,'Save_FCM_TOKEN']);
@@ -47,6 +54,22 @@ Route::middleware('auth:sanctum')->group(function(){
 
 });
 Route::post('updateProductDiscount',[ProductController::class,'updateProductDiscount']);
+
+Route::post('test-pay',[ProductController::class,'payWithJazzCash']);
+
+
+Route::get('test-fly',[TestFlycontroller::class,'test']);
+
+
+Route::get('tamara',[TamaraController::class,'tamar']);
+
+Route::get('tamara/cancel/{reference_id}',[TamaraController::class,'cancel'])->name('tamara.cancel');
+Route::get('tamara/failure/{reference_id}',[TamaraController::class,'failure'])->name('tamara.failure');
+Route::get('tamara/callback/{reference_id}',[TamaraController::class,'callback'])->name('tamara.callback');
+Route::post('tamara/webhook',[TamaraController::class,'webhook'])->name('tamara.webhook');
+
+
+// test 
 
 
 Route::prefix('v1')->middleware('api')->group(base_path('routes/api_v1.php'));
