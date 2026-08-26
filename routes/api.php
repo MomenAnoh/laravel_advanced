@@ -61,6 +61,8 @@ Route::post('test-pay',[ProductController::class,'payWithJazzCash']);
 Route::get('test-fly',[TestFlycontroller::class,'test']);
 
 
+
+
 Route::get('tamara',[TamaraController::class,'tamar']);
 
 Route::get('tamara/cancel/{reference_id}',[TamaraController::class,'cancel'])->name('tamara.cancel');
