@@ -27,3 +27,4 @@ jobs:
         run: |
           cd /home/deployment/laravel_advanced
           git pull origin main
+          
