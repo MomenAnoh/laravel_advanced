@@ -18,4 +18,12 @@ jobs:
 
       - name:  Composer install
         run:  composer install --no-interaction --prefer-dist  
-
+  
+  deploy:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: into project
+        run: |
+          cd /home/deployment/laravel_advanced
+          git pull origin main
