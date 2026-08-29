@@ -26,6 +26,6 @@ jobs:
       - name: into project
         run: |
           cd /home/deployment/laravel_advanced
-          git pull origin main
+          git pull --rebase origin main 
 
-          
+
