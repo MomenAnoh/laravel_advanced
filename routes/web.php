@@ -19,6 +19,10 @@ Route::middleware('auth')->group(function () {
 });
 
 
+Route::get('deploy',function () {
+   return 'ok';
+});
+
 Route::get('test-pay',[ProductController::class,'payWithCard']);
 
 Route::get('/login-page', function () {
