@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('deploy',function () {
-   return 'asdgjdfsagjaldfkjsgoidfhjgjijkldfhjgio';
+   return 'خن';
 });
 
 Route::get('test-pay',[ProductController::class,'payWithCard']);
