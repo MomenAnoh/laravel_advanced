@@ -18,10 +18,7 @@ jobs:
 
       - name:  Composer install
         run:  composer install --no-interaction --prefer-dist  
-      - name:  Run migrations
-        run:  php artisan migrate  
-      - name:  Clearing
-        run:  php artisan optimize:clear
+
   
   deploy:
     runs-on: ubuntu-latest
