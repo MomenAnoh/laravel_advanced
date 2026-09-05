@@ -31,7 +31,7 @@
               username: ${{ secrets.SERVERUSER }}
               key: ${{ secrets.LARAVEL_ADVANCED_SSH_KEY }}
               script: |
-                cd laravel-advanced
+                cd /var/www/laravel_advanced
                 git pull origin main
                 composer install --no-interaction --prefer-dist
                 php artisan migrate --force
