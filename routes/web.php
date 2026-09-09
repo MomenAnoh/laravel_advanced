@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/cicd', function () {
-    return 'CI/CD deployment works! 🚀';
+    return 'greate greate 🚀';
 });
 
 Route::get('test-pay',[ProductController::class,'payWithCard']);
