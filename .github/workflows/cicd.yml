@@ -7,13 +7,8 @@ on:
 
 jobs:
 
-  test:
-    runs-on: ubuntu-latest
-
-
   deploy:
     runs-on: ubuntu-latest
-    needs: test
 
     steps:
       - name: Connect to server
@@ -28,7 +23,8 @@ jobs:
 
             echo "Pull latest code..."
             git pull origin main
-            
+
+            echo "Ensure containers are running..."
             docker compose up -d
 
             echo "Run migrations..."
@@ -38,4 +34,3 @@ jobs:
             docker compose exec -T laravel-app php artisan optimize:clear
 
             echo "Deployment completed!"
-            
