@@ -42,3 +42,4 @@ jobs:
             docker compose exec -T laravel-app php artisan optimize:clear
 
             echo "Deployment completed!"
+            
