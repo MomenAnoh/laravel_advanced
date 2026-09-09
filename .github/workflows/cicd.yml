@@ -6,14 +6,6 @@ on:
       - main
 
 jobs:
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
   deploy:
     runs-on: ubuntu-latest
     needs: test
@@ -31,6 +23,8 @@ jobs:
 
             echo "Pull latest code..."
             git pull origin main
+            
+            docker compose up -d
 
             echo "Run migrations..."
             docker compose exec -T laravel-app php artisan migrate --force
