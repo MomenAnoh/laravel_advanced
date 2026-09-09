@@ -10,6 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+
     steps:
       - name: Connect to server
         uses: appleboy/ssh-action@v1
@@ -23,8 +24,7 @@ jobs:
 
             echo "Pull latest code..."
             git pull origin main
-
-            echo "Ensure containers are running..."
+            
             docker compose up -d
 
             echo "Run migrations..."
@@ -34,3 +34,4 @@ jobs:
             docker compose exec -T laravel-app php artisan optimize:clear
 
             echo "Deployment completed!"
+            
