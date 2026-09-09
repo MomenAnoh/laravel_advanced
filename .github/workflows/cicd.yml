@@ -1,41 +1,44 @@
-  name: doploy-project
+name: deploy-project
 
-  on:
-    push:
-      branches:
-        - main
-  jobs:
-    test:
-      runs-on: ubuntu-latest
-      steps:
-        - name: checkout code
-          uses: actions/checkout@v4
+on:
+  push:
+    branches:
+      - main
 
-        # - name:  Setup PHP
-        #   uses:  shivammathur/setup-php@v2
-        #   with: 
-        #       php-version: '8.4'
+jobs:
 
-        # - name:  Composer install
-        #   run:  composer install --no-interaction --prefer-dist  
+  test:
+    runs-on: ubuntu-latest
 
-    
-    deploy:
-      runs-on: ubuntu-latest
-      needs: test
-      steps:
-          - name: Connect to server
-            uses: appleboy/ssh-action@v1
-            with:
-              host: ${{ secrets.SERVERIP }}
-              username: ${{ secrets.SERVERUSER }}
-              key: ${{ secrets.LARAVEL_ADVANCED_SSH_KEY }}
-              script: |
-                cd /root/laravel_advanced
-                git pull origin main
-                # composer install --no-interaction --prefer-dist
-                php artisan migrate --force
-                php artisan optimize:clear
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            
-    
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Connect to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVERIP }}
+          username: ${{ secrets.SERVERUSER }}
+          key: ${{ secrets.LARAVEL_ADVANCED_SSH_KEY }}
+
+          script: |
+            cd /root/laravel_advanced
+
+            echo "Pull latest code..."
+            git pull origin main
+
+            echo "Build and restart containers..."
+            docker compose up -d --build
+
+            echo "Run migrations..."
+            docker compose exec -T laravel-app php artisan migrate --force
+
+            echo "Clear Laravel cache..."
+            docker compose exec -T laravel-app php artisan optimize:clear
+
+            echo "Deployment completed!"

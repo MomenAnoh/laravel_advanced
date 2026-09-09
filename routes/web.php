@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderAndProduct\ProductController;
+use App\Http\Controllers\TapyController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +25,9 @@ Route::get('deploy',function () {
 });
 
 Route::get('test-pay',[ProductController::class,'payWithCard']);
+
+Route::post('tabby/checkout', [TapyController::class, 'tapy'])->name('tabby.checkout');
+Route::any('tabby/callback', [TapyController::class, 'callback'])->name('tabby.callback');
 
 Route::get('/login-page', function () {
     return view('auth');

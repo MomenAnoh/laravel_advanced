@@ -6,6 +6,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderAndProduct\ProductController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\TamaraController;
+use App\Http\Controllers\TapyController;
 use App\Http\Controllers\TestFlycontroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,8 @@ Route::get('test-fly',[TestFlycontroller::class,'test']);
 
 
 Route::get('tamara',[TamaraController::class,'tamar']);
+Route::get('tapy',[TapyController::class,'tapy']);
+
 
 Route::get('tamara/cancel/{reference_id}',[TamaraController::class,'cancel'])->name('tamara.cancel');
 Route::get('tamara/failure/{reference_id}',[TamaraController::class,'failure'])->name('tamara.failure');
