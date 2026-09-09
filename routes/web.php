@@ -20,8 +20,8 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::get('deploy',function () {
-   return 'asdgadsfgfadfgdf AHMED ';
+Route::get('/cicd', function () {
+    return 'CI/CD deployment works! 🚀';
 });
 
 Route::get('test-pay',[ProductController::class,'payWithCard']);
