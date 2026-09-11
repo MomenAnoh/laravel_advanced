@@ -10,7 +10,7 @@ services:
         env_file:
                ./.env
         volumes:
-            - ./:/var/www/html      
+            - ./:/var/www/html/public      
 
     database:
                 container_name: mysql
@@ -33,7 +33,7 @@ services:
             - "80:80"
         volumes:
             - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-            - ./:/var/www/html
+            - ./:/var/www/html/public
         depends_on:
             - laravel-app                
 
