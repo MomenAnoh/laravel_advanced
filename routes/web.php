@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/cicd', function () {
-    return 'XVBBBBBBBBBBBBBBBXXXBBBBBBBBBBB test ';
+    return 'غغ test ';
 
 });
 
