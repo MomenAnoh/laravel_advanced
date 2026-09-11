@@ -21,8 +21,9 @@ WORKDIR /var/www/html
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
-
-RUN chmod -R 777 storage bootstrap/cache
+RUN cd /root/laravel_advanced
+RUN sudo chown -R www-data:www-data storage bootstrap/cache
+RUN sudo chmod -R 775 storage bootstrap/cache
 
 EXPOSE 9000
 

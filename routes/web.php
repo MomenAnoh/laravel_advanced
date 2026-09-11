@@ -21,8 +21,8 @@ Route::middleware('auth')->group(function () {
 
 
 Route::get('/cicd', function () {
-    return 'again test ';
-    
+    return 'againSDFGHWRSETYR test ';
+
 });
 
 Route::get('test-pay',[ProductController::class,'payWithCard']);
