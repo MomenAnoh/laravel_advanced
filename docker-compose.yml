@@ -2,8 +2,7 @@ services:
     laravel-app:
         container_name: laravel-app
         build: .
-        ports:
-            - "9000:9000"
+
         depends_on:
             - database
         
