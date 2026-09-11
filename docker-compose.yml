@@ -3,14 +3,14 @@ services:
         container_name: laravel-app
         build: .
         ports:
-            - "9000:9000"
+            - "8000:8000"
         depends_on:
             - database
         
         env_file:
                ./.env
         volumes:
-            - ./:/app       
+            - ./:/var/www/html      
 
     database:
                 container_name: mysql
